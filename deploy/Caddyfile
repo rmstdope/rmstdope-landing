@@ -1,0 +1,33 @@
+{
+	admin off
+	auto_https off
+}
+
+:8080 {
+	root * /srv
+	header Cache-Control "no-cache"
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	# Only existing hashed assets are immutable; misses fall through as no-cache 404s.
+	@asset {
+		path /_astro/*
+		file
+	}
+	handle @asset {
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	handle {
+		file_server
+	}
+
+	# Error responses drop headers set above, so mark them uncacheable explicitly.
+	handle_errors {
+		header Cache-Control "no-cache"
+		respond "{err.status_code} {err.status_text}"
+	}
+}
