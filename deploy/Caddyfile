@@ -24,4 +24,10 @@
 	handle {
 		file_server
 	}
+
+	# Error responses drop headers set above, so mark them uncacheable explicitly.
+	handle_errors {
+		header Cache-Control "no-cache"
+		respond "{err.status_code} {err.status_text}"
+	}
 }
