@@ -8,7 +8,10 @@ import time
 
 
 def run(*args):
-    return subprocess.run(args, check=True, text=True, capture_output=True).stdout.strip()
+    result = subprocess.run(args, text=True, capture_output=True)
+    if result.returncode:
+        raise RuntimeError(f"{' '.join(args)} failed: {result.stderr.strip()}")
+    return result.stdout.strip()
 
 
 def verify(image, revision):
@@ -49,9 +52,10 @@ def verify(image, revision):
         for missing in ("/_astro/not-present.js", "/not-present", "/not-present.css"):
             code, _, headers = fetch(missing)
             assert code != 0 and "404" in headers, f"Missing path must return 404: {missing}"
+            assert "cache-control: no-cache" in headers, f"404 must not be cached: {missing}"
         print("Production container smoke checks passed.")
     finally:
-        subprocess.run(["docker", "rm", "--force", container], check=True)
+        subprocess.run(["docker", "rm", "--force", container], capture_output=True)
 
 
 if __name__ == "__main__":
