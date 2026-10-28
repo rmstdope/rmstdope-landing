@@ -35,6 +35,15 @@ def verify(image, revision):
             )
             return response.returncode, response.stdout, response.stderr.lower()
 
+        def fetch_raw(path):
+            # BusyBox wget does not print headers of error responses, so speak HTTP directly.
+            request = f"GET {path} HTTP/1.0\r\nHost: localhost\r\n\r\n"
+            response = subprocess.run(
+                ["docker", "exec", "-i", container, "nc", "127.0.0.1", "8080"],
+                input=request, text=True, capture_output=True,
+            )
+            return response.stdout.split("\r\n\r\n", 1)[0].lower()
+
         code, body, headers = fetch("/")
         assert code == 0 and "<html" in body, "Production HTML is not served"
         assert "<h1>rmstdope.eu</h1>" in body, "Landing heading is missing"
@@ -50,8 +59,8 @@ def verify(image, revision):
         code, body, _ = fetch("/healthz")
         assert code == 0 and body == "ok", "Health endpoint failed"
         for missing in ("/_astro/not-present.js", "/not-present", "/not-present.css"):
-            code, _, headers = fetch(missing)
-            assert code != 0 and "404" in headers, f"Missing path must return 404: {missing}"
+            headers = fetch_raw(missing)
+            assert headers.startswith("http/1.0 404"), f"Missing path must return 404: {missing}"
             assert "cache-control: no-cache" in headers, f"404 must not be cached: {missing}"
         print("Production container smoke checks passed.")
     finally:
