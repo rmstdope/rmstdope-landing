@@ -1,6 +1,9 @@
 #!/bin/sh
-# Runs the stats refresher beside the main process (Caddy by default).
+# Runs the stats refresher beside Caddy. Other commands (a shell, `caddy
+# version`, ...) run without it.
 set -eu
 
-/usr/local/lib/landing/refresh-stats.sh &
+if [ "${1:-}" = caddy ]; then
+  /usr/local/lib/landing/refresh-stats.sh &
+fi
 exec "$@"

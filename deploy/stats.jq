@@ -24,7 +24,7 @@ end
             stars: .stargazers_count,
             language: .language,
             createdAt: .created_at,
-            pushedAt: .pushed_at
+            pushedAt: (.pushed_at // .created_at)
           }
         })
       | from_entries

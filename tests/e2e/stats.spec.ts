@@ -35,6 +35,39 @@ test.describe("live stats", () => {
     ).toHaveText("99");
   });
 
+  test("rebuilds language bars when the ranking changes", async ({ page }) => {
+    await page.route("/stats.json", async (route) => {
+      const stats = await (await route.fetch()).json();
+      stats.languages = [
+        { name: "Rust", repos: 9 },
+        { name: "Go", repos: 3 },
+        { name: "Shell", repos: 1 },
+      ];
+      await route.fulfill({ json: stats });
+    });
+    await page.goto("/");
+
+    const bars = page.locator("[data-lang-list] li");
+    await expect(bars).toHaveCount(2);
+    await expect(bars.first()).toHaveAttribute("data-lang", "Rust");
+    await expect(bars.first().locator(".count")).toHaveText("9");
+    await expect(page.locator('[data-stat="restRepos"]')).toHaveText("1");
+  });
+
+  test("ignores /stats.json with a malformed repo entry", async ({ page }) => {
+    await page.route("/stats.json", async (route) => {
+      const stats = await (await route.fetch()).json();
+      stats.publicRepos = 42;
+      stats.repos.neser.pushedAt = null;
+      await route.fulfill({ json: stats });
+    });
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator('.status [data-stat="publicRepos"]')).toHaveText(
+      String(baked.publicRepos),
+    );
+  });
+
   test("keeps build-time numbers when /stats.json is malformed", async ({
     page,
   }) => {

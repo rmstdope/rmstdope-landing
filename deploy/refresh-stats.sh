@@ -5,6 +5,14 @@ set -u
 
 lib=/usr/local/lib/landing
 interval=${STATS_REFRESH_SECONDS:-3600}
+case $interval in
+'' | *[!0-9]*)
+  echo "stats: invalid STATS_REFRESH_SECONDS '$interval'; using 3600" >&2
+  interval=3600
+  ;;
+esac
+# Never poll faster than once a minute: the GitHub quota is shared per IP.
+[ "$interval" -ge 60 ] || interval=60
 
 while :; do
   if "$lib/sync-stats.sh" /srv/stats.json "$lib/stats.jq"; then

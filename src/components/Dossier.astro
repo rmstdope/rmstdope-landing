@@ -1,5 +1,6 @@
 ---
-import { languageBars, minute, stats } from "../data/stats";
+import { languageBars, minute } from "../data/format";
+import { stats } from "../data/stats";
 
 const { rows, rest } = languageBars(stats.languages);
 ---
@@ -17,7 +18,7 @@ const { rows, rest } = languageBars(stats.languages);
     </div>
     <div class="languages">
       <h3>Public repos by primary language</h3>
-      <ul>
+      <ul data-lang-list>
         {rows.map((bar) => (
           <li data-lang={bar.name} style={`--pct: ${bar.pct}%`}>
             <span class="name">{bar.name}</span>
@@ -28,8 +29,17 @@ const { rows, rest } = languageBars(stats.languages);
           </li>
         ))}
       </ul>
-      <p class="rest">
-        + <span data-stat="restRepos">{rest}</span> more in other languages
+      <template id="lang-row">
+        <li>
+          <span class="name"></span>
+          <span class="bar" aria-hidden="true">
+            <span></span>
+          </span>
+          <span class="count"></span>
+        </li>
+      </template>
+      <p class="rest" data-rest hidden={rest === 0}>
+        + <span data-stat="restRepos">{rest}</span> more repos
       </p>
       <p class="sync">
         LAST SYNC{" "}
@@ -84,7 +94,7 @@ const { rows, rest } = languageBars(stats.languages);
     text-transform: uppercase;
   }
 
-  ul {
+  .languages ul {
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -93,7 +103,7 @@ const { rows, rest } = languageBars(stats.languages);
     list-style: none;
   }
 
-  li {
+  .languages :global(li) {
     display: grid;
     grid-template-columns: 110px minmax(0, 1fr) 32px;
     gap: 14px;
@@ -101,12 +111,12 @@ const { rows, rest } = languageBars(stats.languages);
     font-size: 13px;
   }
 
-  .bar {
+  .languages :global(.bar) {
     height: 10px;
     background: var(--wash);
   }
 
-  .bar span {
+  .languages :global(.bar span) {
     display: block;
     width: var(--pct);
     height: 100%;
@@ -115,7 +125,7 @@ const { rows, rest } = languageBars(stats.languages);
     transition: width 0.6s ease;
   }
 
-  .count {
+  .languages :global(.count) {
     color: var(--muted);
     text-align: right;
   }
