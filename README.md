@@ -36,8 +36,8 @@ Install the test browser once with `npx playwright install chromium`.
 Project screenshots are optional. Drop them in `src/assets/screenshots/` as
 `<repo id><n>.png` (or `.jpg`/`.webp`), e.g. `neser1.png`, `neser2.png`, using the
 id from `src/data/projects.ts`, and commit. Several screenshots for a project
-become a slideshow in order of `n`. Use 16:9 at 1600×900 or larger; taller
-images are cropped from the top. The build resizes them to WebP; a file that
+become a slideshow in order of `n`. 16:9 at 1600×900 or larger fills the frame;
+other shapes are shown whole, letterboxed. The build resizes them to WebP; a file that
 matches no featured repo, or a repeated number, fails the build. Projects
 without screenshots keep the radar placeholder.
 
