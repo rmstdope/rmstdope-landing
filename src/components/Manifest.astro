@@ -1,6 +1,7 @@
 ---
 import { projects } from "../data/projects";
 import ProjectDetails from "./ProjectDetails.astro";
+import ProjectDialog from "./ProjectDialog.astro";
 import RowCells from "./RowCells.astro";
 
 const [first] = projects;
@@ -13,7 +14,7 @@ const [first] = projects;
         <h2 id="manifest-title">Project manifest</h2>
         <p class="hint">
           <span class="pointer-hint">
-            HOVER TO LOCK TARGET · CLICK TO ENGAGE
+            HOVER TO LOCK TARGET · CLICK FOR DOSSIER
           </span>
           <span class="touch-hint">TAP A ROW FOR DETAILS</span>
         </p>
@@ -36,19 +37,11 @@ const [first] = projects;
                 target="_blank"
                 rel="noopener"
                 data-target={project.id}
+                aria-haspopup="dialog"
                 data-active={project === first ? "" : undefined}
               >
                 <RowCells project={project} />
               </a>
-              <details class="disclosure">
-                <summary class="row row-grid">
-                  <RowCells project={project} />
-                  <span class="toggle" aria-hidden="true" />
-                </summary>
-                <div class="inline-details">
-                  <ProjectDetails project={project} showTitle={false} />
-                </div>
-              </details>
             </li>
           ))}
         </ol>
@@ -66,11 +59,15 @@ const [first] = projects;
       ))}
     </aside>
   </div>
+  {projects.map((project) => (
+    <ProjectDialog project={project} />
+  ))}
 </section>
 
 <script>
-  // Desktop: hovering or focusing a row shows its panel. Rows stay plain links,
-  // so without JavaScript the first project's panel shows and clicks still work.
+  // Desktop: hovering or focusing a row shows its panel. Clicking a row opens
+  // its dossier popup. Rows stay links to GitHub, so without JavaScript, or
+  // with a modifier key, they still open the repository.
   const rows = document.querySelectorAll<HTMLAnchorElement>(
     ".manifest a.row[data-target]",
   );
@@ -89,7 +86,35 @@ const [first] = projects;
     const id = row.dataset.target!;
     row.addEventListener("pointerenter", () => lock(id));
     row.addEventListener("focus", () => lock(id));
+    row.addEventListener("click", (event) => {
+      const modified =
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey;
+      const dialog = document.querySelector<HTMLDialogElement>(
+        `dialog[data-dialog="${id}"]`,
+      );
+      if (modified || !dialog) return;
+      event.preventDefault();
+      dialog.showModal();
+    });
   });
+
+  for (const dialog of document.querySelectorAll<HTMLDialogElement>(
+    "dialog[data-dialog]",
+  )) {
+    // A click on the dialog element itself landed on the backdrop.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("keydown", (event) => {
+      const step = { ArrowLeft: "prev", ArrowRight: "next" }[event.key];
+      if (!step) return;
+      dialog.querySelector<HTMLButtonElement>(`.step.${step}`)?.click();
+    });
+  }
 </script>
 
 <style>
@@ -175,8 +200,7 @@ const [first] = projects;
   }
 
   .row:hover,
-  .row:focus-visible,
-  .row[data-active] {
+  .row:focus-visible {
     background: var(--wash);
     color: var(--text);
   }
@@ -203,9 +227,7 @@ const [first] = projects;
   }
 
   .row:hover :global(.caret),
-  .row:focus-visible :global(.caret),
-  .row[data-active] :global(.caret),
-  .disclosure[open] :global(.caret) {
+  .row:focus-visible :global(.caret) {
     opacity: 1;
   }
 
@@ -249,52 +271,48 @@ const [first] = projects;
     border-bottom: 3px solid var(--warn);
   }
 
-  /* Touch and narrow screens: rows are accordions, no side panel. */
-  a.row,
+  /* Touch and narrow screens: compact rows, no side panel. */
   .columns,
   .target,
   .pointer-hint {
     display: none;
   }
 
-  .disclosure summary {
-    grid-template-columns: 48px minmax(0, 1fr) auto 24px;
-    list-style: none;
+  a.row {
+    grid-template-columns: 48px minmax(0, 1fr) auto 16px;
   }
 
-  .disclosure summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .disclosure summary :global(.lang),
-  .disclosure summary :global(.stars),
-  .disclosure summary :global(.since) {
-    display: none;
-  }
-
-  .toggle::before {
-    content: "+";
+  a.row::after {
+    content: "›";
     color: var(--accent);
     font-size: 18px;
   }
 
-  .disclosure[open] .toggle::before {
-    content: "−";
-  }
-
-  .disclosure[open] summary {
-    background: var(--wash);
-  }
-
-  .inline-details {
-    padding: 18px;
-    border-bottom: 1px solid var(--line-faint);
+  a.row :global(.lang),
+  a.row :global(.stars),
+  a.row :global(.since) {
+    display: none;
   }
 
   @media (hover: hover) and (min-width: 960px) {
-    a.row,
     .columns {
       display: grid;
+    }
+
+    a.row {
+      grid-template-columns:
+        56px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr)
+        40px 56px;
+    }
+
+    a.row::after {
+      content: none;
+    }
+
+    a.row :global(.lang),
+    a.row :global(.stars),
+    a.row :global(.since) {
+      display: block;
     }
 
     .target {
@@ -307,9 +325,17 @@ const [first] = projects;
       display: inline;
     }
 
-    .disclosure,
     .touch-hint {
       display: none;
+    }
+
+    /* The row whose panel is showing. */
+    .row[data-active] {
+      background: var(--wash);
+    }
+
+    .row[data-active] :global(.caret) {
+      opacity: 1;
     }
   }
 </style>

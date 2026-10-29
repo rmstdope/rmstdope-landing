@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 test.describe("desktop", () => {
@@ -20,7 +21,56 @@ test.describe("desktop", () => {
     await expect(page.locator('[data-panel="raster"]')).toBeVisible();
   });
 
-  test("rows open the GitHub repository", async ({ page }) => {
+  test("clicking a row opens its dossier popup", async ({ page }) => {
+    await page.goto("/");
+    await page.locator('a.row[data-target="atlantis-hud"]').click();
+    const dialog = page.getByRole("dialog", { name: "atlantis-hud" });
+    await expect(dialog).toBeVisible();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      dialog.getByRole("link", { name: "Engage on GitHub: atlantis-hud" }),
+    ).toHaveAttribute("href", "https://github.com/rmstdope/atlantis-hud");
+    await expect(
+      dialog.getByRole("link", { name: "Live: atlantis-hud" }),
+    ).toHaveAttribute("href", "https://atlantis-hud.rmstdope.eu");
+
+    // Let the opening fade finish so contrast is measured at full strength.
+    await dialog.evaluate((el) =>
+      Promise.all(el.getAnimations().map((a) => a.finished)),
+    );
+    const { violations } = await new AxeBuilder({ page })
+      .include('dialog[data-dialog="atlantis-hud"]')
+      .analyze();
+    const serious = violations.filter((v) =>
+      ["serious", "critical"].includes(v.impact ?? ""),
+    );
+    expect(serious.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(
+      page.locator('a.row[data-target="atlantis-hud"]'),
+    ).toBeFocused();
+  });
+
+  test("the popup closes from its button and the backdrop", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const dialog = page.getByRole("dialog", { name: "cerebro" });
+    await page.locator('a.row[data-target="cerebro"]').click();
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toBeHidden();
+
+    await page.locator('a.row[data-target="cerebro"]').click();
+    await expect(dialog).toBeVisible();
+    await page.mouse.click(5, 5);
+    await expect(dialog).toBeHidden();
+  });
+
+  test("rows link to the GitHub repository without JavaScript", async ({
+    page,
+  }) => {
     await page.goto("/");
     await expect(page.locator('a.row[data-target="DDXX"]')).toHaveAttribute(
       "href",
@@ -77,6 +127,21 @@ test.describe("screenshots", () => {
     await expect(slides.last()).toHaveAttribute("data-active", "");
   });
 
+  test("slide with the arrow keys in the popup", async ({ page }) => {
+    const { panel } = await showPanel(page, (count) => count > 1);
+    const id = await panel.getAttribute("data-panel");
+    await page.locator(`a.row[data-target="${id}"]`).click();
+    const slides = page.locator(`dialog[data-dialog="${id}"] .shot`);
+    await expect(slides.first()).toHaveAttribute("data-active", "");
+
+    await page.keyboard.press("ArrowRight");
+    await expect(slides.nth(1)).toHaveAttribute("data-active", "");
+    await page.keyboard.press("ArrowLeft");
+    await expect(slides.first()).toHaveAttribute("data-active", "");
+    await page.keyboard.press("ArrowLeft");
+    await expect(slides.last()).toHaveAttribute("data-active", "");
+  });
+
   test("projects without any keep the placeholder", async ({ page }) => {
     const { panel } = await showPanel(page, (count) => count === 0);
     await expect(panel.getByText("AWAITING VISUAL FEED")).toBeVisible();
@@ -86,18 +151,26 @@ test.describe("screenshots", () => {
 test.describe("mobile", () => {
   test.skip(({ isMobile }) => !isMobile, "touch layout only");
 
-  test("tapping a row expands its details", async ({ page }) => {
+  test("tapping a row opens its dossier popup", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(".target")).toBeHidden();
 
-    const item = page.locator("details", { hasText: "atlantis-hud" });
-    await item.locator("summary").tap();
-    await expect(item).toHaveAttribute("open", "");
+    await page.locator('a.row[data-target="atlantis-hud"]').tap();
+    const dialog = page.getByRole("dialog", { name: "atlantis-hud" });
+    await expect(dialog).toBeVisible();
     await expect(
-      item.getByRole("link", { name: "Engage on GitHub: atlantis-hud" }),
+      dialog.getByRole("link", { name: "Engage on GitHub: atlantis-hud" }),
     ).toHaveAttribute("href", "https://github.com/rmstdope/atlantis-hud");
     await expect(
-      item.getByRole("link", { name: "Live: atlantis-hud" }),
+      dialog.getByRole("link", { name: "Live: atlantis-hud" }),
     ).toHaveAttribute("href", "https://atlantis-hud.rmstdope.eu");
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+
+    await dialog.getByRole("button", { name: "Close" }).tap();
+    await expect(dialog).toBeHidden();
   });
 });
