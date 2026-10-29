@@ -25,9 +25,7 @@ function typing<T>(text: string, index: number, extra: T) {
   <div class="container layout">
     <div class="identity">
       <p class="eyebrow">▲ SYSTEMS ONLINE</p>
-      <h1 class="name">
-        <span>rmstdope</span>
-      </h1>
+      <h1 class="name">rmstdope</h1>
       <div class="boot" role="log" aria-label="Boot log">
         {boot.map((line) => (
           <p class="line" style={line.style}>
@@ -91,10 +89,6 @@ function typing<T>(text: string, index: number, extra: T) {
     color: var(--warn);
     font-size: 13px;
     letter-spacing: 0.24em;
-  }
-
-  .name span {
-    display: block;
   }
 
   .name {

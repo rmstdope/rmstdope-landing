@@ -37,9 +37,19 @@ test("does not scroll horizontally", async ({ page }) => {
 test("shows the boot log immediately with reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const opacity = await page
-    .locator(".boot .ok")
-    .last()
-    .evaluate((el) => getComputedStyle(el).opacity);
-  expect(opacity).toBe("1");
+  const opacities = await page
+    .locator(".boot .line > span")
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));
+  expect(opacities.length).toBeGreaterThan(0);
+  expect(new Set(opacities)).toEqual(new Set(["1"]));
+});
+
+// The site presents as rmstdope; only the contact address may carry a name.
+test("keeps the real name out of the page", async ({ page }) => {
+  await page.goto("/");
+  const html = await page.evaluate(() => {
+    document.querySelector(".contact")?.remove();
+    return document.documentElement.outerHTML;
+  });
+  expect(html).not.toMatch(/henrik|kurelid/i);
 });
