@@ -31,7 +31,8 @@ def verify(image, revision):
             response = subprocess.run(
                 ["docker", "exec", container, "wget", "-S", "-O", "-",
                  "http://127.0.0.1:8080" + path],
-                text=True, capture_output=True,
+                # Fonts are binary; only headers and text bodies are inspected.
+                text=True, errors="replace", capture_output=True,
             )
             return response.returncode, response.stdout, response.stderr.lower()
 
