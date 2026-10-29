@@ -46,14 +46,21 @@ def verify(image, revision):
 
         code, body, headers = fetch("/")
         assert code == 0 and "<html" in body, "Production HTML is not served"
-        assert re.search(r"<h1[^>]*>Henrik<br[^>]*>Kurelid</h1>", body), "Landing heading is missing"
+        heading = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
+        text = re.sub(r"<[^>]+>", " ", heading.group(1)) if heading else ""
+        assert text.split() == ["Henrik", "Kurelid"], "Landing heading is missing"
         assert "cache-control: no-cache" in headers, "HTML must revalidate"
-        assets = re.findall(r'(?:src|href)="(/_astro/[^"]+)"', body)
-        assert assets, "Production HTML has no hashed assets"
-        for asset in assets:
+        stylesheets = re.findall(r'href="(/_astro/[^"]+\.css)"', body)
+        assert stylesheets, "Production HTML has no hashed stylesheet"
+        assets = set(re.findall(r'(?:src|href)="(/_astro/[^"]+)"', body))
+        for stylesheet in stylesheets:
+            _, css, _ = fetch(stylesheet)
+            assets.update(re.findall(r'url\((/_astro/[^)]+)\)', css))
+        assert any(a.endswith(".woff2") for a in assets), "Self-hosted fonts are missing"
+        for asset in sorted(assets):
             code, _, headers = fetch(asset)
             assert code == 0, f"Asset is missing: {asset}"
-            assert "max-age=31536000, immutable" in headers, "Hashed assets must be cacheable"
+            assert "max-age=31536000, immutable" in headers, f"Hashed asset must be cacheable: {asset}"
         code, body, headers = fetch("/release.json")
         assert code == 0 and json.loads(body) == {"revision": revision}, "Wrong release identity"
         assert "cache-control: no-cache" in headers, "Release identity must revalidate"

@@ -1,5 +1,6 @@
 ---
 import { featured } from "../data/featured";
+import { github } from "../data/site";
 
 const ticker = featured.map((name) => name.toUpperCase()).join(" ◆ ") + " ◆";
 ---
@@ -12,8 +13,8 @@ const ticker = featured.map((name) => name.toUpperCase()).join(" ◆ ") + " ◆"
     </div>
   </div>
   <div class="container meta">
-    <span>© {new Date().getFullYear()} H. KURELID · END OF TRANSMISSION</span>
-    <a href="https://github.com/rmstdope">GITHUB.COM/RMSTDOPE ↗</a>
+    <span>© H. KURELID · END OF TRANSMISSION</span>
+    <a href={github}>GITHUB.COM/RMSTDOPE ↗</a>
   </div>
 </footer>
 
