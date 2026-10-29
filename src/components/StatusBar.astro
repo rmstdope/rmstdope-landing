@@ -1,5 +1,6 @@
 ---
 import { github } from "../data/site";
+import { stats } from "../data/stats";
 ---
 
 <header class="status">
@@ -17,9 +18,13 @@ import { github } from "../data/site";
       <li>
         UPLINK <span class="online">● GITHUB</span>
       </li>
+      <li>
+        PUBLIC REPOS <span data-stat="publicRepos">{stats.publicRepos}</span>
+      </li>
     </ul>
     <nav aria-label="Primary">
       <a href="#manifest">[MANIFEST]</a>
+      <a href="#dossier">[DOSSIER]</a>
       <a href={github}>[GITHUB ↗]</a>
     </nav>
   </div>

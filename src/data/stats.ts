@@ -1,22 +1,20 @@
+import { isSnapshot, type RepoStats, type Snapshot } from "./format";
 import snapshot from "./github-stats.json";
 
-export interface RepoStats {
-  stars: number;
-  language: string | null;
-  createdAt: string;
-  pushedAt: string;
+if (!isSnapshot(snapshot)) {
+  throw new Error("src/data/github-stats.json is malformed; run npm run sync");
 }
 
-const repos: Record<string, RepoStats> = snapshot.repos;
+export const stats: Snapshot = snapshot;
 
 /**
  * Stats for a repository. The snapshot only contains public, non-fork repos,
  * so a missing entry fails the build instead of featuring a private repo.
  */
 export function statsFor(id: string): RepoStats {
-  const stats = Object.hasOwn(repos, id) ? repos[id] : undefined;
-  if (!stats) {
+  const repo = Object.hasOwn(stats.repos, id) ? stats.repos[id] : undefined;
+  if (!repo) {
     throw new Error(`${id} is not a public repository in github-stats.json`);
   }
-  return stats;
+  return repo;
 }

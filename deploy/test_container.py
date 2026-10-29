@@ -65,6 +65,20 @@ def verify(image, revision):
         code, body, headers = fetch("/release.json")
         assert code == 0 and json.loads(body) == {"revision": revision}, "Wrong release identity"
         assert "cache-control: no-cache" in headers, "Release identity must revalidate"
+        code, body, headers = fetch("/stats.json")
+        stats = json.loads(body) if code == 0 else {}
+        assert stats.get("publicRepos", 0) > 0 and stats.get("repos"), "Build-time stats are not served"
+        assert "cache-control: no-cache" in headers, "Stats must revalidate"
+        # The container has no network here, so the refresher must fail and keep the baked file.
+        for _ in range(20):
+            logs = subprocess.run(["docker", "logs", container], text=True, capture_output=True).stderr
+            if "stats: refresh failed" in logs:
+                break
+            time.sleep(0.5)
+        else:
+            raise AssertionError("Stats refresher did not run")
+        code, body, _ = fetch("/stats.json")
+        assert code == 0 and json.loads(body) == stats, "Failed refresh must keep previous stats"
         code, body, _ = fetch("/healthz")
         assert code == 0 and body == "ok", "Health endpoint failed"
         for missing in ("/_astro/not-present.js", "/not-present", "/not-present.css"):

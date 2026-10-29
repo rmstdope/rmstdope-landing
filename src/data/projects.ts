@@ -1,4 +1,5 @@
 import { github, liveUrl } from "./site";
+import { formatRepo } from "./format";
 import { statsFor } from "./stats";
 
 export type Category = "emu" | "game" | "agent" | "demo";
@@ -103,8 +104,7 @@ export const projects = curated.map((project, index) => {
     code: `P-${String(index + 1).padStart(2, "0")}`,
     categoryCode: categories[project.category].code,
     url: `${github}/${project.id}`,
-    stars: stats.stars,
-    language: stats.language ?? "—",
+    ...formatRepo(stats),
     since: stats.createdAt.slice(0, 4),
   };
 });

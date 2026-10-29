@@ -16,9 +16,13 @@ const { project } = Astro.props;
   {project.id}
 </span>
 <span class="cell class">{project.categoryCode}</span>
-<span class="cell lang">{project.language}</span>
+<span class="cell lang" data-repo={project.id} data-stat="language">
+  {project.language}
+</span>
 <span class="cell stars">
-  {project.stars}
+  <span data-repo={project.id} data-stat="stars">
+    {project.stars}
+  </span>
   <span class="visually-hidden"> stars</span>
 </span>
 <span class="cell since">{project.since}</span>

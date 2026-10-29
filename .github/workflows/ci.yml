@@ -32,6 +32,9 @@ jobs:
       - name: Type check
         run: npm run check
 
+      - name: Test stats transform
+        run: sh deploy/test_stats.sh
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
