@@ -1,3 +1,4 @@
+import type { ImageMetadata } from "astro";
 import { github, liveUrl } from "./site";
 import { formatRepo } from "./format";
 import { statsFor } from "./stats";
@@ -96,6 +97,28 @@ function checkLive(id: string, live: string | undefined) {
   }
 }
 
+// Screenshots are optional: src/assets/screenshots/<repo id>.png (or .jpg,
+// .webp), matched case-insensitively. Stray files fail the build.
+const screenshotFiles = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/screenshots/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
+  { eager: true },
+);
+const screenshots = new Map<string, ImageMetadata>();
+for (const [path, module] of Object.entries(screenshotFiles)) {
+  const name = path
+    .split("/")
+    .pop()!
+    .replace(/\.[^.]+$/, "")
+    .toLowerCase();
+  if (!curated.some(({ id }) => id.toLowerCase() === name)) {
+    throw new Error(`${path} does not match a featured repository id`);
+  }
+  if (screenshots.has(name)) {
+    throw new Error(`more than one screenshot for ${name}`);
+  }
+  screenshots.set(name, module.default);
+}
+
 export const projects = curated.map((project, index) => {
   checkLive(project.id, project.live);
   const stats = statsFor(project.id);
@@ -106,6 +129,7 @@ export const projects = curated.map((project, index) => {
     url: `${github}/${project.id}`,
     ...formatRepo(stats),
     since: stats.createdAt.slice(0, 4),
+    screenshot: screenshots.get(project.id.toLowerCase()),
   };
 });
 

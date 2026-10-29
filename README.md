@@ -31,6 +31,16 @@ Install the test browser once with `npx playwright install chromium`.
   dates); a featured repo missing from it fails the build. Refresh it with
   `npm run sync` (needs `jq` and `curl`).
 
+## Screenshots and share image
+
+Project screenshots are optional. Add `src/assets/screenshots/<repo id>.png`
+(16:9, at least 1600×900; the id as in `src/data/projects.ts`, e.g. `neser.png`).
+The build resizes them to WebP; a file that matches no featured repo fails the
+build, and projects without one keep the radar placeholder.
+
+`public/og.png` is the social share image. Regenerate it with `npm run og`
+after changing the name, tagline or palette.
+
 ## Production image
 
 The `Dockerfile` builds the site and copies `dist/` into a `caddy` image that
