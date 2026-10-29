@@ -15,7 +15,7 @@ npm run dev           # local dev server
 npm run check         # Astro/TypeScript checks
 npm run format:check  # Prettier
 npm run build         # static output in dist/
-npm run test:e2e      # Playwright + axe against the build (desktop and Pixel 7)
+npm run test:e2e      # build, then Playwright + axe (desktop and Pixel 7)
 ```
 
 Install the test browser once with `npx playwright install chromium`.

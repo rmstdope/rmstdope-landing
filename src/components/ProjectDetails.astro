@@ -39,12 +39,20 @@ const { project, showTitle = true } = Astro.props;
     ))}
   </ul>
   <div class="actions">
-    <a class="cmd" href={project.url}>
-      &gt; ENGAGE ON GITHUB<span class="visually-hidden">: {project.id}</span> ↗
+    <a
+      class="cmd"
+      href={project.url}
+      aria-label={`Engage on GitHub: ${project.id}`}
+    >
+      &gt; ENGAGE ON GITHUB ↗
     </a>
     {project.live && (
-      <a class="cmd ghost" href={project.live}>
-        LIVE<span class="visually-hidden">: {project.id}</span> ↗
+      <a
+        class="cmd ghost"
+        href={project.live}
+        aria-label={`Live: ${project.id}`}
+      >
+        LIVE ↗
       </a>
     )}
   </div>
@@ -159,38 +167,5 @@ const { project, showTitle = true } = Astro.props;
     border: 1px solid rgb(157 255 90 / 35%);
     color: #c3ddb6;
     font-size: 12px;
-  }
-
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .cmd {
-    display: inline-flex;
-    align-items: center;
-    min-height: 46px;
-    padding: 0 20px;
-    background: var(--accent);
-    color: var(--bg);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-decoration: none;
-  }
-
-  .cmd:hover {
-    background: var(--accent-hover);
-    color: var(--bg);
-  }
-
-  .cmd.ghost {
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-  }
-
-  .cmd.ghost:hover {
-    background: rgb(157 255 90 / 10%);
   }
 </style>

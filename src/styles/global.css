@@ -15,6 +15,7 @@
   --warn: #ffb547;
   --line: rgb(157 255 90 / 20%);
   --line-faint: rgb(157 255 90 / 10%);
+  --wash: rgb(157 255 90 / 10%);
 
   /* Project categories; each differs in lightness as well as hue. */
   --cat-emu: #9dff5a;
@@ -73,6 +74,41 @@ a:hover {
   max-width: var(--content);
   margin-inline: auto;
   padding-inline: var(--gutter);
+}
+
+/* Command buttons: solid primary, outlined secondary. */
+.cmd {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.cmd:hover {
+  background: var(--accent-hover);
+  color: var(--bg);
+}
+
+.cmd.ghost {
+  background: transparent;
+  color: var(--accent);
+}
+
+.cmd.ghost:hover {
+  background: var(--wash);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .visually-hidden {

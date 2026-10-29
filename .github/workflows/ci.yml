@@ -32,30 +32,10 @@ jobs:
       - name: Type check
         run: npm run check
 
-      - name: Build
-        run: npm run build
-
-  e2e:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
-      - name: Build
-        run: npm run build
-
-      - name: Run end-to-end and accessibility tests
+      - name: Build, then run end-to-end and accessibility tests
         run: npm run test:e2e
 
       - name: Upload Playwright traces
@@ -88,7 +68,7 @@ jobs:
 
   publish-image:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [check, e2e, container-smoke]
+    needs: [check, container-smoke]
     runs-on: ubuntu-latest
     permissions:
       contents: read

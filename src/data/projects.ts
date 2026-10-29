@@ -1,13 +1,13 @@
-import { github } from "./site";
+import { github, liveUrl } from "./site";
 import { statsFor } from "./stats";
 
 export type Category = "emu" | "game" | "agent" | "demo";
 
-export const categories: Record<Category, { code: string; label: string }> = {
-  emu: { code: "EMU", label: "Emulation" },
-  game: { code: "GAME", label: "Games" },
-  agent: { code: "AGENT", label: "Agents & tools" },
-  demo: { code: "DEMO", label: "Demoscene" },
+export const categories: Record<Category, { code: string }> = {
+  emu: { code: "EMU" },
+  game: { code: "GAME" },
+  agent: { code: "AGENT" },
+  demo: { code: "DEMO" },
 };
 
 interface Curated {
@@ -88,11 +88,9 @@ const curated: Curated[] = [
 ];
 
 function checkLive(id: string, live: string | undefined) {
-  if (live === undefined) return;
-  const url = new URL(live);
-  if (url.protocol !== "https:" || !url.hostname.endsWith(".rmstdope.eu")) {
+  if (live !== undefined && !liveUrl.test(live)) {
     throw new Error(
-      `${id}: live URL must be https://*.rmstdope.eu, got ${live}`,
+      `${id}: live URL must be https://<name>.rmstdope.eu, got ${live}`,
     );
   }
 }
@@ -104,7 +102,6 @@ export const projects = curated.map((project, index) => {
     ...project,
     code: `P-${String(index + 1).padStart(2, "0")}`,
     categoryCode: categories[project.category].code,
-    categoryLabel: categories[project.category].label,
     url: `${github}/${project.id}`,
     stars: stats.stars,
     language: stats.language ?? "—",

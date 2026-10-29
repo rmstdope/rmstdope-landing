@@ -237,40 +237,6 @@ function typing<T>(text: string, index: number, extra: T) {
     line-height: 1.7;
   }
 
-  .cmd {
-    display: inline-flex;
-    align-items: center;
-    min-height: 48px;
-    padding: 0 22px;
-    background: var(--accent);
-    color: var(--bg);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-decoration: none;
-    transition: background 0.15s ease;
-  }
-
-  .cmd:hover {
-    background: var(--accent-hover);
-    color: var(--bg);
-  }
-
-  .cmd.ghost {
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-  }
-
-  .cmd.ghost:hover {
-    background: rgb(157 255 90 / 10%);
-  }
-
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .line,
     .leader,

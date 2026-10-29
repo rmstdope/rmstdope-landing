@@ -40,11 +40,10 @@ test.describe("mobile", () => {
     await item.locator("summary").tap();
     await expect(item).toHaveAttribute("open", "");
     await expect(
-      item.getByRole("link", { name: /ENGAGE ON GITHUB/ }),
+      item.getByRole("link", { name: "Engage on GitHub: atlantis-hud" }),
     ).toHaveAttribute("href", "https://github.com/rmstdope/atlantis-hud");
-    await expect(item.getByRole("link", { name: /LIVE/ })).toHaveAttribute(
-      "href",
-      "https://atlantis-hud.rmstdope.eu",
-    );
+    await expect(
+      item.getByRole("link", { name: "Live: atlantis-hud" }),
+    ).toHaveAttribute("href", "https://atlantis-hud.rmstdope.eu");
   });
 });

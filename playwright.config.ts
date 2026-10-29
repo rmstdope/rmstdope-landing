@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = 4321;
+// Not Astro's default dev port, so a running `npm run dev` is never tested by mistake.
+const port = 4329;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -11,12 +12,12 @@ export default defineConfig({
     baseURL: `http://localhost:${port}`,
     trace: "retain-on-failure",
   },
-  // Tests run against the production build; run `npm run build` first.
+  // Tests run against the production build; `npm run test:e2e` builds first.
   // --ignore-lock keeps Astro from detaching the server when run by an agent.
   webServer: {
     command: `npm run preview -- --port ${port} --ignore-lock`,
     url: `http://localhost:${port}`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
   },
   projects: [
     {

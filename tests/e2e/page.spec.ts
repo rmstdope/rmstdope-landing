@@ -1,9 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { liveUrl } from "../../src/data/site";
 
 // Every outbound link must go to the GitHub profile or an rmstdope.eu deployment.
-const allowedLink =
-  /^https:\/\/(github\.com\/rmstdope(\/[\w.-]+)?|[a-z0-9-]+\.rmstdope\.eu)\/?$/;
+const githubLink = /^https:\/\/github\.com\/rmstdope(\/[\w.-]+)?$/;
 
 test("outbound links stay on GitHub or rmstdope.eu", async ({ page }) => {
   await page.goto("/");
@@ -12,7 +12,7 @@ test("outbound links stay on GitHub or rmstdope.eu", async ({ page }) => {
     .evaluateAll((links) => links.map((a) => a.getAttribute("href")!));
   expect(hrefs.length).toBeGreaterThan(0);
   for (const href of hrefs) {
-    expect(href, href).toMatch(allowedLink);
+    expect(githubLink.test(href) || liveUrl.test(href), href).toBe(true);
     expect(href).not.toContain("kurelid.se");
   }
 });
