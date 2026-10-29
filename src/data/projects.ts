@@ -3,12 +3,13 @@ import { github, liveUrl } from "./site";
 import { formatRepo } from "./format";
 import { statsFor } from "./stats";
 
-export type Category = "emu" | "game" | "agent" | "demo";
+export type Category = "emu" | "game" | "agent" | "web" | "demo";
 
 export const categories: Record<Category, { code: string }> = {
   emu: { code: "EMU" },
   game: { code: "GAME" },
   agent: { code: "AGENT" },
+  web: { code: "WEB" },
   demo: { code: "DEMO" },
 };
 
@@ -68,6 +69,22 @@ const curated: Curated[] = [
     summary:
       "Audio tool for game narratives: casts voices by audition, records narration line by line and checks every take with Whisper.",
     tags: ["voice", "narration", "whisper"],
+  },
+  {
+    id: "dominos",
+    category: "web",
+    summary:
+      "Pizza nights, ordered ahead: staff plan an event and its menu, invite guests by email, and guests build their pizza before orders close. Invite-only, in English and Swedish.",
+    tags: ["react", "hono", "postgres", "i18n"],
+    live: "https://dominos.rmstdope.eu",
+  },
+  {
+    id: "rmstdope-dashboard",
+    category: "web",
+    summary:
+      "Public, read-only dashboard for the apps on rmstdope.eu: health, version, deployment time and automation status for each, refreshed from a host collector every minute.",
+    tags: ["dashboard", "ops", "no-framework"],
+    live: "https://dashboard.rmstdope.eu",
   },
   {
     id: "slidecraft",
