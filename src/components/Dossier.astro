@@ -22,7 +22,7 @@ const { rows, rest } = languageBars(stats.languages);
       <div class="contact">
         <h3>Contact</h3>
         <span class="mail" data-mail={reversed}>
-          {user} [at] {domain.replace(".", " [dot] ")}
+          {user} [at] {domain.replaceAll(".", " [dot] ")}
         </span>
       </div>
     </div>
