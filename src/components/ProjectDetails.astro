@@ -12,17 +12,32 @@ const { project, showTitle = true } = Astro.props;
 ---
 
 <div class="details" style={`--cat: var(--cat-${project.category})`}>
-  {project.screenshot ? (
-    <div class="visual">
-      <Image
-        class="shot"
-        src={project.screenshot}
-        alt={`Screenshot of ${project.id}`}
-        widths={[480, 800, 1200]}
-        sizes="(min-width: 960px) 520px, 100vw"
-        loading="lazy"
-      />
+  {project.screenshots.length > 0 ? (
+    <div class="visual" data-slides>
+      {project.screenshots.map((screenshot, index) => (
+        <Image
+          class="shot"
+          src={screenshot}
+          alt={`Screenshot ${index + 1} of ${project.screenshots.length}: ${project.id}`}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 960px) 520px, 100vw"
+          loading="lazy"
+          data-active={index === 0 ? "" : undefined}
+          aria-hidden={index === 0 ? undefined : "true"}
+        />
+      ))}
       <span class="scan" aria-hidden="true" />
+      {project.screenshots.length > 1 && (
+        <div class="dots">
+          {project.screenshots.map((_, index) => (
+            <button
+              type="button"
+              aria-label={`Show screenshot ${index + 1} of ${project.screenshots.length}`}
+              aria-pressed={index === 0 ? "true" : "false"}
+            />
+          ))}
+        </div>
+      )}
     </div>
   ) : (
     <div class="visual" aria-hidden="true">
@@ -112,6 +127,55 @@ const { project, showTitle = true } = Astro.props;
     height: 100%;
     object-fit: cover;
     object-position: top;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .shot[data-active] {
+    opacity: 1;
+  }
+
+  .dots {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    display: flex;
+    gap: 6px;
+  }
+
+  /* 24px hit area around a small HUD tick. */
+  .dots button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .dots button::before {
+    content: "";
+    display: block;
+    width: 14px;
+    height: 4px;
+    margin: auto;
+    background: rgb(157 255 90 / 35%);
+    box-shadow: 0 0 0 1px rgb(7 8 6 / 70%);
+  }
+
+  .dots button[aria-pressed="true"]::before {
+    background: var(--accent);
+  }
+
+  .dots button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shot {
+      transition: none;
+    }
   }
 
   /* Faint scanlines keep screenshots in the HUD look. */

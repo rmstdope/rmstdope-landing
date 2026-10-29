@@ -97,26 +97,38 @@ function checkLive(id: string, live: string | undefined) {
   }
 }
 
-// Screenshots are optional: src/assets/screenshots/<repo id>.png (or .jpg,
-// .webp), matched case-insensitively. Stray files fail the build.
+// Screenshots are optional: src/assets/screenshots/<repo id><n>.png (or .jpg,
+// .webp), matched case-insensitively and shown in order of n. A file that
+// matches no featured repository, or a repeated number, fails the build.
 const screenshotFiles = import.meta.glob<{ default: ImageMetadata }>(
   "../assets/screenshots/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
   { eager: true },
 );
-const screenshots = new Map<string, ImageMetadata>();
+
+const screenshots = new Map<string, { n: number; image: ImageMetadata }[]>();
 for (const [path, module] of Object.entries(screenshotFiles)) {
   const name = path
     .split("/")
     .pop()!
     .replace(/\.[^.]+$/, "")
     .toLowerCase();
-  if (!curated.some(({ id }) => id.toLowerCase() === name)) {
-    throw new Error(`${path} does not match a featured repository id`);
+  const match = /^(.+?)(\d+)$/.exec(name);
+  const id = match?.[1];
+  if (!id || !curated.some((project) => project.id.toLowerCase() === id)) {
+    throw new Error(`${path} must be named <featured repository id><number>`);
   }
-  if (screenshots.has(name)) {
-    throw new Error(`more than one screenshot for ${name}`);
+  const n = Number(match[2]);
+  const shots = screenshots.get(id) ?? [];
+  if (shots.some((shot) => shot.n === n)) {
+    throw new Error(`more than one screenshot ${n} for ${id}`);
   }
-  screenshots.set(name, module.default);
+  screenshots.set(id, [...shots, { n, image: module.default }]);
+}
+
+function screenshotsFor(id: string) {
+  return (screenshots.get(id.toLowerCase()) ?? [])
+    .sort((a, b) => a.n - b.n)
+    .map((shot) => shot.image);
 }
 
 export const projects = curated.map((project, index) => {
@@ -129,7 +141,7 @@ export const projects = curated.map((project, index) => {
     url: `${github}/${project.id}`,
     ...formatRepo(stats),
     since: stats.createdAt.slice(0, 4),
-    screenshot: screenshots.get(project.id.toLowerCase()),
+    screenshots: screenshotsFor(project.id),
   };
 });
 
