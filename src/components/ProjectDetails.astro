@@ -82,6 +82,8 @@ const { project, showTitle = true } = Astro.props;
     <a
       class="cmd"
       href={project.url}
+      target="_blank"
+      rel="noopener"
       aria-label={`Engage on GitHub: ${project.id}`}
     >
       &gt; ENGAGE ON GITHUB ↗
@@ -90,6 +92,8 @@ const { project, showTitle = true } = Astro.props;
       <a
         class="cmd ghost"
         href={project.live}
+        target="_blank"
+        rel="noopener"
         aria-label={`Live: ${project.id}`}
       >
         LIVE ↗

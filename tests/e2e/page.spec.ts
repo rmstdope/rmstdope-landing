@@ -17,6 +17,20 @@ test("outbound links stay on GitHub or rmstdope.eu", async ({ page }) => {
   }
 });
 
+test("outbound links open in a new tab", async ({ page }) => {
+  await page.goto("/");
+  const links = await page
+    .locator("a[href^='http']")
+    .evaluateAll((links) =>
+      links.map((a) => [a.getAttribute("target"), a.getAttribute("rel")]),
+    );
+  expect(links.length).toBeGreaterThan(0);
+  for (const [target, rel] of links) {
+    expect(target).toBe("_blank");
+    expect(rel).toContain("noopener");
+  }
+});
+
 test("has no serious accessibility violations", async ({ page }) => {
   await page.goto("/");
   const { violations } = await new AxeBuilder({ page }).analyze();
