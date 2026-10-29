@@ -17,7 +17,7 @@ const sizes = large
 ---
 
 {count > 0 ? (
-  <div class="visual" data-slides>
+  <div class="visual" data-slides data-zoomable={large ? "" : undefined}>
     <div class="track">
       {project.screenshots.map((screenshot, index) => (
         <Image
@@ -33,6 +33,16 @@ const sizes = large
       ))}
     </div>
     <span class="scan" aria-hidden="true" />
+    {large && (
+      <button
+        class="zoom"
+        type="button"
+        aria-label="Show screenshots fullscreen"
+        aria-pressed="false"
+      >
+        ⛶
+      </button>
+    )}
     {count > 1 && (
       <>
         <button
@@ -104,6 +114,55 @@ const sizes = large
     height: 100%;
     /* Whole screenshot, letterboxed on the grid whatever its shape. */
     object-fit: contain;
+  }
+
+  /* Popup screenshots expand: real fullscreen, or a fixed overlay. */
+  [data-zoomable] .shot {
+    cursor: zoom-in;
+  }
+
+  .visual:fullscreen,
+  .visual[data-expanded] {
+    aspect-ratio: auto;
+    border: 0;
+    background-color: #000;
+  }
+
+  .visual[data-expanded] {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+  }
+
+  .visual:fullscreen .shot,
+  .visual[data-expanded] .shot {
+    cursor: zoom-out;
+  }
+
+  .zoom {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid rgb(157 255 90 / 35%);
+    background: rgb(7 8 6 / 70%);
+    color: var(--accent);
+    font: inherit;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  .zoom:hover,
+  .zoom:focus-visible {
+    opacity: 1;
+  }
+
+  .zoom:focus-visible {
+    outline-offset: -2px;
   }
 
   /* Faint scanlines keep screenshots in the HUD look. */

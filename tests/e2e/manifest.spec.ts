@@ -142,6 +142,50 @@ test.describe("screenshots", () => {
     await expect(slides.last()).toHaveAttribute("data-active", "");
   });
 
+  test("expand to fullscreen from the popup", async ({ page }) => {
+    const { panel } = await showPanel(page, (count) => count > 0);
+    const id = await panel.getAttribute("data-panel");
+    await page.locator(`a.row[data-target="${id}"]`).click();
+    const dialog = page.locator(`dialog[data-dialog="${id}"]`);
+    const zoom = dialog.locator(".zoom");
+    await expect(zoom).toHaveAttribute("aria-pressed", "false");
+
+    await dialog.locator(".shot[data-active]").click();
+    await expect(zoom).toHaveAttribute("aria-pressed", "true");
+    const box = await dialog.locator(".visual").boundingBox();
+    const viewport = page.viewportSize()!;
+    expect(box?.width).toBe(viewport.width);
+
+    await dialog.locator(".shot[data-active]").click();
+    await expect(zoom).toHaveAttribute("aria-pressed", "false");
+    await expect(dialog).toBeVisible();
+  });
+
+  test("fall back to an overlay that Esc leaves first", async ({ page }) => {
+    await page.addInitScript(() => {
+      // Like iPhone Safari: no fullscreen for elements.
+      Object.defineProperty(Element.prototype, "requestFullscreen", {
+        value: undefined,
+      });
+    });
+    const { panel } = await showPanel(page, (count) => count > 0);
+    const id = await panel.getAttribute("data-panel");
+    await page.locator(`a.row[data-target="${id}"]`).click();
+    const dialog = page.locator(`dialog[data-dialog="${id}"]`);
+    const zoom = dialog.locator(".zoom");
+
+    await zoom.click();
+    await expect(dialog.locator(".visual")).toHaveAttribute(
+      "data-expanded",
+      "",
+    );
+    await page.keyboard.press("Escape");
+    await expect(zoom).toHaveAttribute("aria-pressed", "false");
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+  });
+
   test("projects without any keep the placeholder", async ({ page }) => {
     const { panel } = await showPanel(page, (count) => count === 0);
     await expect(panel.getByText("AWAITING VISUAL FEED")).toBeVisible();

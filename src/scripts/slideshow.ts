@@ -58,7 +58,10 @@ for (const show of document.querySelectorAll<HTMLElement>("[data-slides]")) {
     if (start === undefined) return;
     const distance = event.clientX - start;
     start = undefined;
-    if (Math.abs(distance) >= swipe) choose(current + (distance < 0 ? 1 : -1));
+    if (Math.abs(distance) >= swipe) {
+      show.dataset.swipedAt = String(Date.now());
+      choose(current + (distance < 0 ? 1 : -1));
+    }
   });
   show.addEventListener("pointercancel", () => (start = undefined));
 
@@ -68,4 +71,57 @@ for (const show of document.querySelectorAll<HTMLElement>("[data-slides]")) {
     if (entry.isIntersecting) shots.forEach((shot) => (shot.loading = "eager"));
     run(entry.isIntersecting);
   }).observe(show);
+}
+
+// Popup screenshots expand to fullscreen from a click or the zoom button.
+// Browsers without element fullscreen (iPhone Safari) get a fixed overlay.
+for (const show of document.querySelectorAll<HTMLElement>(
+  "[data-slides][data-zoomable]",
+)) {
+  const button = show.querySelector<HTMLButtonElement>(".zoom")!;
+  const dialog = show.closest("dialog");
+
+  const sync = () => {
+    const on =
+      document.fullscreenElement === show || show.hasAttribute("data-expanded");
+    button.setAttribute("aria-pressed", String(on));
+    button.ariaLabel = on ? "Exit fullscreen" : "Show screenshots fullscreen";
+  };
+
+  const overlay = (on: boolean) => {
+    show.toggleAttribute("data-expanded", on);
+    sync();
+  };
+
+  const toggle = () => {
+    if (document.fullscreenElement === show) {
+      void document.exitFullscreen();
+    } else if (show.hasAttribute("data-expanded")) {
+      overlay(false);
+    } else if (show.requestFullscreen) {
+      show.requestFullscreen().catch(() => overlay(true));
+    } else {
+      overlay(true);
+    }
+  };
+
+  button.addEventListener("click", toggle);
+  show.querySelectorAll(".shot").forEach((shot) =>
+    shot.addEventListener("click", () => {
+      // A swipe on touch screens can end in a click; it only changes slides.
+      if (Date.now() - Number(show.dataset.swipedAt ?? 0) > 400) toggle();
+    }),
+  );
+  document.addEventListener("fullscreenchange", sync);
+
+  // Esc leaves the overlay first; closing the popup always leaves it.
+  dialog?.addEventListener("cancel", (event) => {
+    if (!show.hasAttribute("data-expanded")) return;
+    event.preventDefault();
+    overlay(false);
+  });
+  dialog?.addEventListener("close", () => {
+    if (document.fullscreenElement === show) void document.exitFullscreen();
+    overlay(false);
+  });
 }
