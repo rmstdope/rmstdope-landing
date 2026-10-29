@@ -1,0 +1,24 @@
+---
+import type { Project } from "../data/projects";
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<span class="cell code">{project.code}</span>
+<span class="cell name">
+  <span class="caret" aria-hidden="true">
+    ▶
+  </span>
+  {project.id}
+</span>
+<span class="cell class">{project.categoryCode}</span>
+<span class="cell lang">{project.language}</span>
+<span class="cell stars">
+  {project.stars}
+  <span class="visually-hidden"> stars</span>
+</span>
+<span class="cell since">{project.since}</span>

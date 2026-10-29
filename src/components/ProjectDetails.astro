@@ -1,0 +1,196 @@
+---
+import type { Project } from "../data/projects";
+
+interface Props {
+  project: Project;
+  /** The accordion already shows the name in its summary row. */
+  showTitle?: boolean;
+}
+
+const { project, showTitle = true } = Astro.props;
+---
+
+<div class="details" style={`--cat: var(--cat-${project.category})`}>
+  <div class="visual" aria-hidden="true">
+    <div class="sweep"></div>
+    <span class="feed">
+      [ {project.id.toUpperCase()} · AWAITING VISUAL FEED ]
+    </span>
+  </div>
+  {showTitle && <h3 class="title">{project.id}</h3>}
+  <p class="summary">{project.summary}</p>
+  <dl class="specs">
+    <div>
+      <dt>LANG</dt>
+      <dd>{project.language}</dd>
+    </div>
+    <div>
+      <dt>STARS</dt>
+      <dd>{project.stars}</dd>
+    </div>
+    <div>
+      <dt>SINCE</dt>
+      <dd>{project.since}</dd>
+    </div>
+  </dl>
+  <ul class="tags" aria-label="Tags">
+    {project.tags.map((tag) => (
+      <li>#{tag}</li>
+    ))}
+  </ul>
+  <div class="actions">
+    <a class="cmd" href={project.url}>
+      &gt; ENGAGE ON GITHUB<span class="visually-hidden">: {project.id}</span> ↗
+    </a>
+    {project.live && (
+      <a class="cmd ghost" href={project.live}>
+        LIVE<span class="visually-hidden">: {project.id}</span> ↗
+      </a>
+    )}
+  </div>
+</div>
+
+<style>
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border: 1px solid rgb(157 255 90 / 30%);
+    background-color: #060805;
+    background-image:
+      linear-gradient(rgb(157 255 90 / 12%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(157 255 90 / 12%) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .sweep {
+    position: absolute;
+    width: 140%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      rgb(157 255 90 / 35%),
+      transparent 70deg,
+      transparent 360deg
+    );
+    opacity: 0.6;
+    animation: sweep 4s linear infinite;
+  }
+
+  @keyframes sweep {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .feed {
+    position: relative;
+    padding-inline: 12px;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
+  .title {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.1;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .summary {
+    margin: 0;
+    color: #c3ddb6;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .specs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    border: 1px solid var(--line);
+    background: var(--line);
+  }
+
+  .specs div {
+    padding: 10px 12px;
+    background: var(--bg);
+  }
+
+  .specs dt {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+
+  .specs dd {
+    margin: 4px 0 0;
+    color: var(--text-strong);
+    font-size: 14px;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags li {
+    padding: 4px 10px;
+    border: 1px solid rgb(157 255 90 / 35%);
+    color: #c3ddb6;
+    font-size: 12px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .cmd {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 20px;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .cmd:hover {
+    background: var(--accent-hover);
+    color: var(--bg);
+  }
+
+  .cmd.ghost {
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .cmd.ghost:hover {
+    background: rgb(157 255 90 / 10%);
+  }
+</style>

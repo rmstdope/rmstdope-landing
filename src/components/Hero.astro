@@ -49,9 +49,14 @@ function typing<T>(text: string, index: number, extra: T) {
         Developer in Linköping, Sweden. Demoscene roots, Rust emulators,
         play-by-email strategy tooling and fleets of AI coding agents.
       </p>
-      <a class="cmd" href={github}>
-        &gt; GITHUB.COM/RMSTDOPE ↗
-      </a>
+      <div class="actions">
+        <a class="cmd" href="#manifest">
+          &gt; OPEN MANIFEST
+        </a>
+        <a class="cmd ghost" href={github}>
+          GITHUB ↗
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -235,7 +240,6 @@ function typing<T>(text: string, index: number, extra: T) {
   .cmd {
     display: inline-flex;
     align-items: center;
-    align-self: flex-start;
     min-height: 48px;
     padding: 0 22px;
     background: var(--accent);
@@ -249,6 +253,22 @@ function typing<T>(text: string, index: number, extra: T) {
   .cmd:hover {
     background: var(--accent-hover);
     color: var(--bg);
+  }
+
+  .cmd.ghost {
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .cmd.ghost:hover {
+    background: rgb(157 255 90 / 10%);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
   @media (prefers-reduced-motion: reduce) {

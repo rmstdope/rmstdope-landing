@@ -16,6 +16,12 @@
   --line: rgb(157 255 90 / 20%);
   --line-faint: rgb(157 255 90 / 10%);
 
+  /* Project categories; each differs in lightness as well as hue. */
+  --cat-emu: #9dff5a;
+  --cat-game: #5adcff;
+  --cat-agent: #ffb547;
+  --cat-demo: #ff8fc8;
+
   --font-display: "Chakra Petch", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
@@ -67,6 +73,15 @@ a:hover {
   max-width: var(--content);
   margin-inline: auto;
   padding-inline: var(--gutter);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .skip-link {
