@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:e2e": "astro build && playwright test",
-    "sync": "sh deploy/sync-stats.sh src/data/github-stats.json"
+    "sync": "sh deploy/sync-stats.sh src/data/github-stats.json",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@fontsource/chakra-petch": "^5.3.0",
