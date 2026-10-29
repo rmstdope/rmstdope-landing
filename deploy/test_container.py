@@ -46,10 +46,11 @@ def verify(image, revision):
 
         code, body, headers = fetch("/")
         assert code == 0 and "<html" in body, "Production HTML is not served"
-        assert "<h1>rmstdope.eu</h1>" in body, "Landing heading is missing"
+        assert re.search(r"<h1[^>]*>Henrik<br[^>]*>Kurelid</h1>", body), "Landing heading is missing"
         assert "cache-control: no-cache" in headers, "HTML must revalidate"
-        # Astro inlines small stylesheets, so hashed assets are optional.
-        for asset in re.findall(r'(?:src|href)="(/_astro/[^"]+)"', body):
+        assets = re.findall(r'(?:src|href)="(/_astro/[^"]+)"', body)
+        assert assets, "Production HTML has no hashed assets"
+        for asset in assets:
             code, _, headers = fetch(asset)
             assert code == 0, f"Asset is missing: {asset}"
             assert "max-age=31536000, immutable" in headers, "Hashed assets must be cacheable"
