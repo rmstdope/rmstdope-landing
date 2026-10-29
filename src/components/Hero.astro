@@ -6,7 +6,7 @@ import { github } from "../data/site";
 const boot = [
   { label: "load profile", status: "ok", tone: "ok" },
   { label: "emulation cores: NES GB GBC GBA SNES", status: "ok", tone: "ok" },
-  { label: "agent fleet: cerebro", status: "standing by", tone: "warn" },
+  { label: "agent fleet: cerebro", status: "running", tone: "ok" },
   { label: "heritage: Dope Demo Productions", status: "archived", tone: "ok" },
 ].map((line, index) => typing(`> ${line.label}`, index, line));
 const prompt = typing("> awaiting operator input", boot.length, {});
@@ -26,7 +26,7 @@ function typing<T>(text: string, index: number, extra: T) {
     <div class="identity">
       <p class="eyebrow">▲ SYSTEMS ONLINE</p>
       <h1 class="name">
-        <span>Henrik</span> <span>Kurelid</span>
+        <span>rmstdope</span>
       </h1>
       <div class="boot" role="log" aria-label="Boot log">
         {boot.map((line) => (
@@ -46,8 +46,8 @@ function typing<T>(text: string, index: number, extra: T) {
     </div>
     <div class="intro">
       <p>
-        Developer in Linköping, Sweden. Demoscene roots, Rust emulators,
-        play-by-email strategy tooling and fleets of AI coding agents.
+        Developer in Linköping, Sweden. Demoscene roots, Rust emulators, retro
+        gaming and fleets of AI coding agents.
       </p>
       <div class="actions">
         <a class="cmd" href="#manifest">
@@ -177,7 +177,6 @@ function typing<T>(text: string, index: number, extra: T) {
 
   .leader,
   .ok,
-  .warn,
   .cursor {
     opacity: 0;
     animation: appear 0s var(--done) forwards;
@@ -204,10 +203,6 @@ function typing<T>(text: string, index: number, extra: T) {
 
   .ok {
     color: var(--accent);
-  }
-
-  .warn {
-    color: var(--warn);
   }
 
   .cursor {
@@ -241,7 +236,6 @@ function typing<T>(text: string, index: number, extra: T) {
     .line,
     .leader,
     .ok,
-    .warn,
     .cursor {
       opacity: 1;
     }

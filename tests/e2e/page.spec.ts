@@ -38,7 +38,8 @@ test("shows the boot log immediately with reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const opacity = await page
-    .locator(".boot .warn")
+    .locator(".boot .ok")
+    .last()
     .evaluate((el) => getComputedStyle(el).opacity);
   expect(opacity).toBe("1");
 });

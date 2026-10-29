@@ -41,7 +41,7 @@ const html = `<!doctype html>
     background: #9dff5a; vertical-align: -5px; }
 </style>
 <div class="top"><span class="brand">RMSTDOPE.EU</span><span class="warn"><span class="tri"></span>SYSTEMS ONLINE</span></div>
-<h1>Henrik<br>Kurelid</h1>
+<h1>rmstdope</h1>
 <div class="tag">&gt; emulators <b>/</b> games <b>/</b> ai agents <b>/</b> demoscene<span class="cursor"></span></div>`;
 
 const browser = await chromium.launch();
