@@ -27,6 +27,8 @@ Install the test browser once with `npx playwright install chromium`.
   the reduced-motion override; fonts are self-hosted via Fontsource (Latin subset).
 - `src/data/projects.ts` lists the featured repositories with curated summaries,
   tags and live URLs (which must be `https://*.rmstdope.eu`). Only public repos belong there.
+  Set `hidden: true` on one to take it off the page while keeping its data and
+  screenshots.
 - `src/data/github-stats.json` is a snapshot of public repo stats (stars, language,
   dates); a featured repo missing from it fails the build. Refresh it with
   `npm run sync` (needs `jq` and `curl`).

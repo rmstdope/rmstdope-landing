@@ -19,6 +19,8 @@ interface Curated {
   tags: string[];
   /** Live deployment; must be an https://*.rmstdope.eu URL. */
   live?: string;
+  /** Kept with its data and screenshots, but left out of the page for now. */
+  hidden?: boolean;
 }
 
 /** Featured repositories, in display order. Only public repos belong here. */
@@ -69,6 +71,7 @@ const curated: Curated[] = [
   },
   {
     id: "slidecraft",
+    hidden: true,
     category: "agent",
     summary:
       "An MDX presentation framework with build steps, shared-element morphs, a browser editor and export to a single HTML file or PDF.",
@@ -131,18 +134,25 @@ function screenshotsFor(id: string) {
     .map((shot) => shot.image);
 }
 
-export const projects = curated.map((project, index) => {
+// Validate every project, shown or not, so hidden ones stay ready to return.
+curated.forEach((project) => {
   checkLive(project.id, project.live);
-  const stats = statsFor(project.id);
-  return {
-    ...project,
-    code: `P-${String(index + 1).padStart(2, "0")}`,
-    categoryCode: categories[project.category].code,
-    url: `${github}/${project.id}`,
-    ...formatRepo(stats),
-    since: stats.createdAt.slice(0, 4),
-    screenshots: screenshotsFor(project.id),
-  };
+  statsFor(project.id);
 });
+
+export const projects = curated
+  .filter((project) => !project.hidden)
+  .map((project, index) => {
+    const stats = statsFor(project.id);
+    return {
+      ...project,
+      code: `P-${String(index + 1).padStart(2, "0")}`,
+      categoryCode: categories[project.category].code,
+      url: `${github}/${project.id}`,
+      ...formatRepo(stats),
+      since: stats.createdAt.slice(0, 4),
+      screenshots: screenshotsFor(project.id),
+    };
+  });
 
 export type Project = (typeof projects)[number];

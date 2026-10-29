@@ -84,6 +84,12 @@ test.describe("desktop", () => {
     await expect(dialog).toBeHidden();
   });
 
+  test("hidden projects are left out", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('[data-target="slidecraft"]')).toHaveCount(0);
+    await expect(page.locator('[data-dialog="slidecraft"]')).toHaveCount(0);
+  });
+
   test("rows link to the GitHub repository without JavaScript", async ({
     page,
   }) => {
