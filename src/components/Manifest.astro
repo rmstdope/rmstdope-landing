@@ -107,6 +107,12 @@ const [first] = projects;
       if (modified || !dialog) return;
       event.preventDefault();
       dialog.showModal();
+      // Closing hands focus back to the row. After a mouse click or tap that
+      // would leave a focus ring on it as the hover moves on, so let it go;
+      // keyboard users (detail 0) keep the ring to see where they are.
+      if (event.detail > 0) {
+        dialog.addEventListener("close", () => row.blur(), { once: true });
+      }
     });
   });
 

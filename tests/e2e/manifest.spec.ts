@@ -51,9 +51,22 @@ test.describe("desktop", () => {
 
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
+    // No focus ring left on a clicked row once the popup closes.
     await expect(
       page.locator('a.row[data-target="atlantis-hud"]'),
-    ).toBeFocused();
+    ).not.toBeFocused();
+  });
+
+  test("keyboard users get focus back on the row", async ({ page }) => {
+    await page.goto("/");
+    const row = page.locator('a.row[data-target="raster"]');
+    await row.focus();
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog", { name: "raster" });
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(row).toBeFocused();
   });
 
   test("the popup closes from its button and the backdrop", async ({
