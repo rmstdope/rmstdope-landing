@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -88,6 +89,9 @@ test.describe("desktop", () => {
     await page.goto("/");
     await expect(page.locator('[data-target="slidecraft"]')).toHaveCount(0);
     await expect(page.locator('[data-dialog="slidecraft"]')).toHaveCount(0);
+    // Its screenshots are kept in the repo but not published with the site.
+    const published = readdirSync("dist/_astro");
+    expect(published.filter((file) => /^slidecraft/i.test(file))).toEqual([]);
   });
 
   test("rows link to the GitHub repository without JavaScript", async ({
