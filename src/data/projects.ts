@@ -27,7 +27,7 @@ const curated: Curated[] = [
     id: "neser",
     category: "emu",
     summary:
-      "Nintendo emulation systems engine in Rust: NES, Game Boy/Color, Game Boy Advance and SNES, with native desktop and browser frontends sharing audio, video, input and save-state code.",
+      "Nintendo emulation systems engine in Rust focused on hardware accuracy and compatibility: NES, Game Boy/Color, Game Boy Advance and SNES, with native desktop and browser frontends sharing audio, video, input and save-state code.",
     tags: ["nes", "gameboy", "gba", "snes"],
     live: "https://neser.rmstdope.eu",
   },
@@ -84,7 +84,7 @@ const curated: Curated[] = [
     id: "4k-softsynth",
     category: "demo",
     summary:
-      "My old 4k softsynth, imported in an attempt to revive it: music synthesis small enough for a 4 kilobyte intro.",
+      "My old 4k softsynth, imported in an attempt to port it to arm64 assembler: music synthesis small enough for a 4 kilobyte intro.",
     tags: ["4k", "synth", "sizecoding"],
   },
 ];
