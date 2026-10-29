@@ -32,8 +32,19 @@ jobs:
       - name: Type check
         run: npm run check
 
-      - name: Build
-        run: npm run build
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Build, then run end-to-end and accessibility tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
 
   container-smoke:
     runs-on: ubuntu-latest

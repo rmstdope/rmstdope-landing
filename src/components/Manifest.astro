@@ -1,0 +1,313 @@
+---
+import { projects } from "../data/projects";
+import ProjectDetails from "./ProjectDetails.astro";
+import RowCells from "./RowCells.astro";
+
+const [first] = projects;
+---
+
+<section id="manifest" class="manifest" aria-labelledby="manifest-title">
+  <div class="container layout">
+    <div class="list">
+      <div class="head">
+        <h2 id="manifest-title">Project manifest</h2>
+        <p class="hint">
+          <span class="pointer-hint">
+            HOVER TO LOCK TARGET · CLICK TO ENGAGE
+          </span>
+          <span class="touch-hint">TAP A ROW FOR DETAILS</span>
+        </p>
+      </div>
+      <div class="table">
+        <div class="columns row-grid" aria-hidden="true">
+          <span>ID</span>
+          <span>DESIGNATION</span>
+          <span>CLASS</span>
+          <span>LANG</span>
+          <span>★</span>
+          <span>SINCE</span>
+        </div>
+        <ol class="rows">
+          {projects.map((project) => (
+            <li style={`--cat: var(--cat-${project.category})`}>
+              <a
+                class="row row-grid"
+                href={project.url}
+                data-target={project.id}
+                data-active={project === first ? "" : undefined}
+              >
+                <RowCells project={project} />
+              </a>
+              <details class="disclosure">
+                <summary class="row row-grid">
+                  <RowCells project={project} />
+                  <span class="toggle" aria-hidden="true" />
+                </summary>
+                <div class="inline-details">
+                  <ProjectDetails project={project} showTitle={false} />
+                </div>
+              </details>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+
+    <aside class="target" aria-label="Project details">
+      <span class="corner tl" aria-hidden="true"></span>
+      <span class="corner br" aria-hidden="true"></span>
+      <p class="lock">◎ TARGET LOCK</p>
+      {projects.map((project) => (
+        <div data-panel={project.id} hidden={project !== first}>
+          <ProjectDetails project={project} />
+        </div>
+      ))}
+    </aside>
+  </div>
+</section>
+
+<script>
+  // Desktop: hovering or focusing a row shows its panel. Rows stay plain links,
+  // so without JavaScript the first project's panel shows and clicks still work.
+  const rows = document.querySelectorAll<HTMLAnchorElement>(
+    ".manifest a.row[data-target]",
+  );
+  const panels = document.querySelectorAll<HTMLElement>(
+    ".manifest [data-panel]",
+  );
+
+  function lock(id: string) {
+    panels.forEach((panel) => (panel.hidden = panel.dataset.panel !== id));
+    rows.forEach((row) =>
+      row.toggleAttribute("data-active", row.dataset.target === id),
+    );
+  }
+
+  rows.forEach((row) => {
+    const id = row.dataset.target!;
+    row.addEventListener("pointerenter", () => lock(id));
+    row.addEventListener("focus", () => lock(id));
+  });
+</script>
+
+<style>
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: flex-start;
+    padding-block: clamp(48px, 7vw, 64px);
+  }
+
+  .list {
+    display: flex;
+    flex: 3 1 min(640px, 100%);
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(28px, 5vw, 40px);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+  }
+
+  .table {
+    border: 1px solid rgb(157 255 90 / 25%);
+  }
+
+  .rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row-grid {
+    display: grid;
+    grid-template-columns:
+      56px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr)
+      40px 56px;
+    gap: 12px;
+    align-items: center;
+    padding-inline: 18px;
+  }
+
+  .columns {
+    padding-block: 12px;
+    border-bottom: 1px solid rgb(157 255 90 / 25%);
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+
+  .row {
+    min-height: 52px;
+    border-bottom: 1px solid var(--line-faint);
+    color: var(--text);
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  li:last-child .row {
+    border-bottom: 0;
+  }
+
+  .row:hover,
+  .row:focus-visible,
+  .row[data-active] {
+    background: var(--wash);
+    color: var(--text);
+  }
+
+  .row :global(.code),
+  .row :global(.since) {
+    color: var(--muted);
+  }
+
+  .row :global(.name) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    color: var(--text-strong);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .row :global(.caret) {
+    color: var(--accent);
+    opacity: 0;
+  }
+
+  .row:hover :global(.caret),
+  .row:focus-visible :global(.caret),
+  .row[data-active] :global(.caret),
+  .disclosure[open] :global(.caret) {
+    opacity: 1;
+  }
+
+  .row :global(.class) {
+    color: var(--cat);
+  }
+
+  .target {
+    position: relative;
+    flex: 2 1 400px;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--accent);
+    background: #0a0d08;
+  }
+
+  .lock {
+    margin: 0 0 18px;
+    color: var(--warn);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+
+  .corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+  }
+
+  .corner.tl {
+    top: -1px;
+    left: -1px;
+    border-top: 3px solid var(--warn);
+    border-left: 3px solid var(--warn);
+  }
+
+  .corner.br {
+    right: -1px;
+    bottom: -1px;
+    border-right: 3px solid var(--warn);
+    border-bottom: 3px solid var(--warn);
+  }
+
+  /* Touch and narrow screens: rows are accordions, no side panel. */
+  a.row,
+  .columns,
+  .target,
+  .pointer-hint {
+    display: none;
+  }
+
+  .disclosure summary {
+    grid-template-columns: 48px minmax(0, 1fr) auto 24px;
+    list-style: none;
+  }
+
+  .disclosure summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure summary :global(.lang),
+  .disclosure summary :global(.stars),
+  .disclosure summary :global(.since) {
+    display: none;
+  }
+
+  .toggle::before {
+    content: "+";
+    color: var(--accent);
+    font-size: 18px;
+  }
+
+  .disclosure[open] .toggle::before {
+    content: "−";
+  }
+
+  .disclosure[open] summary {
+    background: var(--wash);
+  }
+
+  .inline-details {
+    padding: 18px;
+    border-bottom: 1px solid var(--line-faint);
+  }
+
+  @media (hover: hover) and (min-width: 960px) {
+    a.row,
+    .columns {
+      display: grid;
+    }
+
+    .target {
+      position: sticky;
+      top: 24px;
+      display: block;
+    }
+
+    .pointer-hint {
+      display: inline;
+    }
+
+    .disclosure,
+    .touch-hint {
+      display: none;
+    }
+  }
+</style>

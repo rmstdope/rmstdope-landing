@@ -19,6 +19,7 @@ import { github } from "../data/site";
       </li>
     </ul>
     <nav aria-label="Primary">
+      <a href="#manifest">[MANIFEST]</a>
       <a href={github}>[GITHUB ↗]</a>
     </nav>
   </div>
@@ -64,6 +65,11 @@ import { github } from "../data/site";
 
   .readouts .online {
     color: var(--accent);
+  }
+
+  nav {
+    display: flex;
+    gap: 20px;
   }
 
   nav a {

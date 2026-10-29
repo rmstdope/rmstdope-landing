@@ -15,14 +15,20 @@ npm run dev           # local dev server
 npm run check         # Astro/TypeScript checks
 npm run format:check  # Prettier
 npm run build         # static output in dist/
+npm run test:e2e      # build, then Playwright + axe (desktop and Pixel 7)
 ```
+
+Install the test browser once with `npx playwright install chromium`.
 
 ## Structure
 
 - `src/pages/index.astro` composes the page from `src/components/`.
 - `src/styles/global.css` holds the design tokens (colors, fonts, spacing) and
   the reduced-motion override; fonts are self-hosted via Fontsource (Latin subset).
-- `src/data/featured.ts` lists the featured repositories. Only public repos belong there.
+- `src/data/projects.ts` lists the featured repositories with curated summaries,
+  tags and live URLs (which must be `https://*.rmstdope.eu`). Only public repos belong there.
+- `src/data/github-stats.json` is a snapshot of public repo stats (stars, language,
+  dates); a featured repo missing from it fails the build.
 
 ## Production image
 

@@ -1,8 +1,8 @@
 ---
-import { featured } from "../data/featured";
+import { projects } from "../data/projects";
 import { github } from "../data/site";
 
-const ticker = featured.map((name) => name.toUpperCase()).join(" ◆ ") + " ◆";
+const ticker = projects.map(({ id }) => id.toUpperCase()).join(" ◆ ") + " ◆";
 ---
 
 <footer class="footer">
