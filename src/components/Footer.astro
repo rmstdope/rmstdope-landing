@@ -1,0 +1,67 @@
+---
+import { featured } from "../data/featured";
+import { github } from "../data/site";
+
+const ticker = featured.map((name) => name.toUpperCase()).join(" ◆ ") + " ◆";
+---
+
+<footer class="footer">
+  <div class="ticker" aria-hidden="true">
+    <div class="track">
+      <span>{ticker}</span>
+      <span>{ticker}</span>
+    </div>
+  </div>
+  <div class="container meta">
+    <span>© H. KURELID · END OF TRANSMISSION</span>
+    <a href={github}>GITHUB.COM/RMSTDOPE ↗</a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+
+  .ticker {
+    border-bottom: 1px solid var(--line-faint);
+  }
+
+  .track {
+    display: flex;
+    gap: 48px;
+    width: max-content;
+    padding-block: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+    animation: ticker 40s linear infinite;
+  }
+
+  @keyframes ticker {
+    to {
+      transform: translateX(calc(-50% - 24px));
+    }
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-block: 18px 28px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .meta a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+</style>

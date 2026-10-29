@@ -31,7 +31,8 @@ def verify(image, revision):
             response = subprocess.run(
                 ["docker", "exec", container, "wget", "-S", "-O", "-",
                  "http://127.0.0.1:8080" + path],
-                text=True, capture_output=True,
+                # Fonts are binary; only headers and text bodies are inspected.
+                text=True, errors="replace", capture_output=True,
             )
             return response.returncode, response.stdout, response.stderr.lower()
 
@@ -46,13 +47,21 @@ def verify(image, revision):
 
         code, body, headers = fetch("/")
         assert code == 0 and "<html" in body, "Production HTML is not served"
-        assert "<h1>rmstdope.eu</h1>" in body, "Landing heading is missing"
+        heading = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
+        text = re.sub(r"<[^>]+>", " ", heading.group(1)) if heading else ""
+        assert text.split() == ["Henrik", "Kurelid"], "Landing heading is missing"
         assert "cache-control: no-cache" in headers, "HTML must revalidate"
-        # Astro inlines small stylesheets, so hashed assets are optional.
-        for asset in re.findall(r'(?:src|href)="(/_astro/[^"]+)"', body):
+        stylesheets = re.findall(r'href="(/_astro/[^"]+\.css)"', body)
+        assert stylesheets, "Production HTML has no hashed stylesheet"
+        assets = set(re.findall(r'(?:src|href)="(/_astro/[^"]+)"', body))
+        for stylesheet in stylesheets:
+            _, css, _ = fetch(stylesheet)
+            assets.update(re.findall(r'url\((/_astro/[^)]+)\)', css))
+        assert any(a.endswith(".woff2") for a in assets), "Self-hosted fonts are missing"
+        for asset in sorted(assets):
             code, _, headers = fetch(asset)
             assert code == 0, f"Asset is missing: {asset}"
-            assert "max-age=31536000, immutable" in headers, "Hashed assets must be cacheable"
+            assert "max-age=31536000, immutable" in headers, f"Hashed asset must be cacheable: {asset}"
         code, body, headers = fetch("/release.json")
         assert code == 0 and json.loads(body) == {"revision": revision}, "Wrong release identity"
         assert "cache-control: no-cache" in headers, "Release identity must revalidate"

@@ -1,0 +1,75 @@
+---
+import { github } from "../data/site";
+---
+
+<header class="status">
+  <div class="container bar">
+    <a class="brand" href="#top">
+      RMSTDOPE.EU
+    </a>
+    <ul class="readouts" aria-label="Status">
+      <li>
+        OPERATOR <span>H. KURELID</span>
+      </li>
+      <li>
+        LOC <span>LINKÖPING · SE</span>
+      </li>
+      <li>
+        UPLINK <span class="online">● GITHUB</span>
+      </li>
+    </ul>
+    <nav aria-label="Primary">
+      <a href={github}>[GITHUB ↗]</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .status {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 28px;
+    padding-block: 14px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .brand {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .readouts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--muted);
+  }
+
+  .readouts span {
+    color: var(--text);
+  }
+
+  .readouts .online {
+    color: var(--accent);
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+</style>

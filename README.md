@@ -17,6 +17,13 @@ npm run format:check  # Prettier
 npm run build         # static output in dist/
 ```
 
+## Structure
+
+- `src/pages/index.astro` composes the page from `src/components/`.
+- `src/styles/global.css` holds the design tokens (colors, fonts, spacing) and
+  the reduced-motion override; fonts are self-hosted via Fontsource (Latin subset).
+- `src/data/featured.ts` lists the featured repositories. Only public repos belong there.
+
 ## Production image
 
 The `Dockerfile` builds the site and copies `dist/` into a `caddy` image that
