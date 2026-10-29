@@ -49,7 +49,7 @@ def verify(image, revision):
         assert code == 0 and "<html" in body, "Production HTML is not served"
         heading = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
         text = re.sub(r"<[^>]+>", " ", heading.group(1)) if heading else ""
-        assert text.split() == ["Henrik", "Kurelid"], "Landing heading is missing"
+        assert text.split() == ["rmstdope"], "Landing heading is missing"
         assert "cache-control: no-cache" in headers, "HTML must revalidate"
         stylesheets = re.findall(r'href="(/_astro/[^"]+\.css)"', body)
         assert stylesheets, "Production HTML has no hashed stylesheet"
