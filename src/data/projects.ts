@@ -1,5 +1,5 @@
 import { github, liveUrl } from "./site";
-import { statsFor } from "./stats";
+import { day, statsFor } from "./stats";
 
 export type Category = "emu" | "game" | "agent" | "demo";
 
@@ -106,6 +106,7 @@ export const projects = curated.map((project, index) => {
     stars: stats.stars,
     language: stats.language ?? "—",
     since: stats.createdAt.slice(0, 4),
+    pushed: day(stats.pushedAt),
   };
 });
 

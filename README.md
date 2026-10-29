@@ -28,7 +28,8 @@ Install the test browser once with `npx playwright install chromium`.
 - `src/data/projects.ts` lists the featured repositories with curated summaries,
   tags and live URLs (which must be `https://*.rmstdope.eu`). Only public repos belong there.
 - `src/data/github-stats.json` is a snapshot of public repo stats (stars, language,
-  dates); a featured repo missing from it fails the build.
+  dates); a featured repo missing from it fails the build. Refresh it with
+  `npm run sync` (needs `jq` and `curl`).
 
 ## Production image
 
@@ -46,6 +47,25 @@ To smoke-test an image locally (requires Docker):
 docker build --build-arg VCS_REF="$(git rev-parse HEAD)" -t rmstdope-landing:smoke .
 python3 deploy/test_container.py rmstdope-landing:smoke --revision "$(git rev-parse HEAD)"
 ```
+
+## Live GitHub stats
+
+`deploy/sync-stats.sh` fetches the public repo list from the GitHub API (one
+unauthenticated request) and runs `deploy/stats.jq`, which keeps only public,
+non-fork repos and writes the snapshot atomically. `deploy/test_stats.sh`
+checks the transform against fixtures.
+
+The same script runs in two places:
+
+- **Build time:** `npm run sync` updates the committed snapshot. The build bakes
+  it into the HTML and serves it as `/stats.json`.
+- **In the container:** `deploy/entrypoint.sh` starts `deploy/refresh-stats.sh`
+  beside Caddy. It rewrites `/srv/stats.json` at startup and then hourly
+  (`STATS_REFRESH_SECONDS`). A failed refresh keeps the previous file.
+
+In the browser, `src/scripts/live-stats.ts` fetches `/stats.json` and updates
+the repo count, stars, languages, last push and sync time. A missing or
+malformed response leaves the build-time numbers in place.
 
 ## CI and deployment
 

@@ -22,15 +22,25 @@ const { project, showTitle = true } = Astro.props;
   <dl class="specs">
     <div>
       <dt>LANG</dt>
-      <dd>{project.language}</dd>
+      <dd data-repo={project.id} data-stat="language">
+        {project.language}
+      </dd>
     </div>
     <div>
       <dt>STARS</dt>
-      <dd>{project.stars}</dd>
+      <dd data-repo={project.id} data-stat="stars">
+        {project.stars}
+      </dd>
     </div>
     <div>
       <dt>SINCE</dt>
       <dd>{project.since}</dd>
+    </div>
+    <div>
+      <dt>LAST PUSH</dt>
+      <dd data-repo={project.id} data-stat="pushed">
+        {project.pushed}
+      </dd>
     </div>
   </dl>
   <ul class="tags" aria-label="Tags">
@@ -129,7 +139,7 @@ const { project, showTitle = true } = Astro.props;
 
   .specs {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1px;
     margin: 0;
     border: 1px solid var(--line);

@@ -1,0 +1,135 @@
+---
+import { languageBars, minute, stats } from "../data/stats";
+
+const { rows, rest } = languageBars(stats.languages);
+---
+
+<section id="dossier" class="dossier" aria-labelledby="dossier-title">
+  <div class="container layout">
+    <div class="bio">
+      <h2 id="dossier-title">Operator dossier</h2>
+      <p>
+        Started out writing demo engines and 4k synths with Dope Demo
+        Productions. Still drawn to machines with hard limits: today that means
+        Nintendo emulation in Rust, a language for timing-critical NES ROMs, and
+        agent fleets that ship code while I navigate.
+      </p>
+    </div>
+    <div class="languages">
+      <h3>Public repos by primary language</h3>
+      <ul>
+        {rows.map((bar) => (
+          <li data-lang={bar.name} style={`--pct: ${bar.pct}%`}>
+            <span class="name">{bar.name}</span>
+            <span class="bar" aria-hidden="true">
+              <span />
+            </span>
+            <span class="count">{bar.repos}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="rest">
+        + <span data-stat="restRepos">{rest}</span> more in other languages
+      </p>
+      <p class="sync">
+        LAST SYNC{" "}
+        <span data-stat="generatedAt">{minute(stats.generatedAt)}</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .dossier {
+    border-top: 1px solid var(--line);
+  }
+
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    padding-block: clamp(48px, 7vw, 64px);
+  }
+
+  .bio,
+  .languages {
+    display: flex;
+    flex: 1 1 min(420px, 100%);
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(28px, 5vw, 40px);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .bio p {
+    margin: 0;
+    color: #c3ddb6;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr) 32px;
+    gap: 14px;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .bar {
+    height: 10px;
+    background: var(--wash);
+  }
+
+  .bar span {
+    display: block;
+    width: var(--pct);
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 12px rgb(157 255 90 / 60%);
+    transition: width 0.6s ease;
+  }
+
+  .count {
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .rest {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  .sync {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+</style>
