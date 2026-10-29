@@ -25,7 +25,7 @@ test.describe("live stats", () => {
     await expect(page.locator('[data-stat="generatedAt"]')).toHaveText(
       "2030-01-02 03:04Z",
     );
-    const panel = page.locator('[data-panel="neser"]');
+    const panel = page.locator('dialog[data-dialog="neser"]');
     await expect(panel.locator('[data-stat="stars"]')).toHaveText("99");
     await expect(panel.locator('[data-stat="pushed"]')).toHaveText(
       "2030-01-01",

@@ -4,28 +4,22 @@ import type { Project } from "../data/projects";
 
 interface Props {
   project: Project;
-  /** The popup shows screenshots at up to two thirds of the viewport. */
-  large?: boolean;
 }
 
-const { project, large = false } = Astro.props;
+const { project } = Astro.props;
 const count = project.screenshots.length;
-const widths = large ? [800, 1200, 1600, 2400] : [480, 800, 1200];
-const sizes = large
-  ? "(min-width: 960px) 62vw, 100vw"
-  : "(min-width: 960px) 520px, 100vw";
 ---
 
 {count > 0 ? (
-  <div class="visual" data-slides data-zoomable={large ? "" : undefined}>
+  <div class="visual" data-slides>
     <div class="track">
       {project.screenshots.map((screenshot, index) => (
         <Image
           class="shot"
           src={screenshot}
           alt={`Screenshot ${index + 1} of ${count}: ${project.id}`}
-          widths={widths}
-          sizes={sizes}
+          widths={[800, 1200, 1600, 2400]}
+          sizes="(min-width: 960px) 62vw, 100vw"
           loading="lazy"
           data-active={index === 0 ? "" : undefined}
           aria-hidden={index === 0 ? undefined : "true"}
@@ -33,16 +27,14 @@ const sizes = large
       ))}
     </div>
     <span class="scan" aria-hidden="true" />
-    {large && (
-      <button
-        class="zoom"
-        type="button"
-        aria-label="Show screenshots fullscreen"
-        aria-pressed="false"
-      >
-        ⛶
-      </button>
-    )}
+    <button
+      class="zoom"
+      type="button"
+      aria-label="Show screenshots fullscreen"
+      aria-pressed="false"
+    >
+      ⛶
+    </button>
     {count > 1 && (
       <>
         <button
@@ -116,8 +108,8 @@ const sizes = large
     object-fit: contain;
   }
 
-  /* Popup screenshots expand: real fullscreen, or a fixed overlay. */
-  [data-zoomable] .shot {
+  /* Screenshots expand: real fullscreen, or a fixed overlay. */
+  .shot {
     cursor: zoom-in;
   }
 

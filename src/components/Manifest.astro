@@ -1,6 +1,5 @@
 ---
 import { projects } from "../data/projects";
-import ProjectDetails from "./ProjectDetails.astro";
 import ProjectDialog from "./ProjectDialog.astro";
 import RowCells from "./RowCells.astro";
 
@@ -52,11 +51,18 @@ const [first] = projects;
       <span class="corner tl" aria-hidden="true"></span>
       <span class="corner br" aria-hidden="true"></span>
       <p class="lock">◎ TARGET LOCK</p>
-      {projects.map((project) => (
-        <div data-panel={project.id} hidden={project !== first}>
-          <ProjectDetails project={project} />
-        </div>
-      ))}
+      <div class="panels">
+        {projects.map((project) => (
+          <div
+            class="panel"
+            data-panel={project.id}
+            data-active={project === first ? "" : undefined}
+          >
+            <h3 class="title">{project.id}</h3>
+            <p class="summary">{project.summary}</p>
+          </div>
+        ))}
+      </div>
     </aside>
   </div>
   {projects.map((project) => (
@@ -76,7 +82,9 @@ const [first] = projects;
   );
 
   function lock(id: string) {
-    panels.forEach((panel) => (panel.hidden = panel.dataset.panel !== id));
+    panels.forEach((panel) =>
+      panel.toggleAttribute("data-active", panel.dataset.panel === id),
+    );
     rows.forEach((row) =>
       row.toggleAttribute("data-active", row.dataset.target === id),
     );
@@ -249,6 +257,52 @@ const [first] = projects;
     color: var(--warn);
     font-size: 11px;
     letter-spacing: 0.18em;
+  }
+
+  /* Every panel shares one cell, so switching projects cross-fades through a
+     blur without the box changing height. */
+  .panels {
+    display: grid;
+  }
+
+  .panel {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    opacity: 0;
+    filter: blur(10px);
+    transition:
+      opacity 0.35s ease,
+      filter 0.35s ease,
+      visibility 0.35s;
+  }
+
+  .panel[data-active] {
+    visibility: visible;
+    opacity: 1;
+    filter: none;
+  }
+
+  .title {
+    margin: 0 0 14px;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.1;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .summary {
+    margin: 0;
+    color: #c3ddb6;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel {
+      transition: none;
+    }
   }
 
   .corner {

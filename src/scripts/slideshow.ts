@@ -73,11 +73,9 @@ for (const show of document.querySelectorAll<HTMLElement>("[data-slides]")) {
   }).observe(show);
 }
 
-// Popup screenshots expand to fullscreen from a click or the zoom button.
+// Screenshots expand to fullscreen from a click or the zoom button.
 // Browsers without element fullscreen (iPhone Safari) get a fixed overlay.
-for (const show of document.querySelectorAll<HTMLElement>(
-  "[data-slides][data-zoomable]",
-)) {
+for (const show of document.querySelectorAll<HTMLElement>("[data-slides]")) {
   const button = show.querySelector<HTMLButtonElement>(".zoom")!;
   const dialog = show.closest("dialog");
 

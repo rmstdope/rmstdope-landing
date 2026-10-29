@@ -4,22 +4,16 @@ import Slideshow from "./Slideshow.astro";
 
 interface Props {
   project: Project;
-  /** In the popup: large slideshow beside the facts, and the dialog title. */
-  large?: boolean;
 }
 
-const { project, large = false } = Astro.props;
-const Title = large ? "h2" : "h3";
+const { project } = Astro.props;
 ---
 
-<div
-  class:list={["details", { large }]}
-  style={`--cat: var(--cat-${project.category})`}
->
-  <Slideshow project={project} large={large} />
-  <Title class="title" id={large ? `dialog-${project.id}` : undefined}>
+<div class="details" style={`--cat: var(--cat-${project.category})`}>
+  <Slideshow project={project} />
+  <h2 class="title" id={`dialog-${project.id}`}>
     {project.id}
-  </Title>
+  </h2>
   <p class="summary">{project.summary}</p>
   <dl class="specs">
     <div>
@@ -81,15 +75,16 @@ const Title = large ? "h2" : "h3";
     gap: 18px;
   }
 
+  /* Wide screens: large slideshow beside the facts. */
   @media (min-width: 960px) {
-    .large {
+    .details {
       display: grid;
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       gap: 18px 32px;
       align-content: start;
     }
 
-    .large > :global(.visual) {
+    .details > :global(.visual) {
       grid-row: 1 / span 6;
       align-self: start;
     }

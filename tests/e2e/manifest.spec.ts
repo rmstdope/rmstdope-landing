@@ -13,6 +13,9 @@ test.describe("desktop", () => {
     await expect(panel("cerebro")).toBeVisible();
     await expect(panel("neser")).toBeHidden();
     await expect(panel("cerebro").getByRole("heading")).toHaveText("cerebro");
+    // Hover shows the summary only; facts and screenshots are in the popup.
+    await expect(panel("cerebro").locator("p")).toHaveCount(1);
+    await expect(panel("cerebro").locator(".visual, dl, a")).toHaveCount(0);
   });
 
   test("keyboard focus locks the target panel", async ({ page }) => {
@@ -82,30 +85,30 @@ test.describe("desktop", () => {
 // Screenshots are content: these tests pick whichever projects currently
 // have a slideshow or none, so adding screenshots never breaks them.
 test.describe("screenshots", () => {
-  test.skip(({ isMobile }) => isMobile, "uses the desktop panel");
+  test.skip(({ isMobile }) => isMobile, "uses desktop clicks and keys");
 
-  async function showPanel(page: Page, shots: (count: number) => boolean) {
+  async function openDialog(page: Page, shots: (count: number) => boolean) {
     await page.goto("/");
     const ids = await page
-      .locator("[data-panel]")
-      .evaluateAll((panels) =>
-        panels.map((p) => [
-          (p as HTMLElement).dataset.panel!,
-          p.querySelectorAll(".shot").length,
+      .locator("dialog[data-dialog]")
+      .evaluateAll((dialogs) =>
+        dialogs.map((d) => [
+          (d as HTMLElement).dataset.dialog!,
+          d.querySelectorAll(".shot").length,
         ]),
       );
     const match = ids.find(([, count]) => shots(count as number));
     test.skip(!match, "no project has a matching screenshot set");
     const [id, count] = match as [string, number];
-    await page.locator(`a.row[data-target="${id}"]`).hover();
-    const panel = page.locator(`[data-panel="${id}"]`);
-    await expect(panel).toBeVisible();
-    return { panel, slides: panel.locator(".shot"), count };
+    await page.locator(`a.row[data-target="${id}"]`).click();
+    const dialog = page.locator(`dialog[data-dialog="${id}"]`);
+    await expect(dialog).toBeVisible();
+    return { dialog, slides: dialog.locator(".shot"), count };
   }
 
   test("advance on their own", async ({ page }) => {
     await page.clock.install();
-    const { slides } = await showPanel(page, (count) => count > 1);
+    const { slides } = await openDialog(page, (count) => count > 1);
     await expect(slides.first()).toHaveAttribute("data-active", "");
 
     await page.clock.runFor(4000);
@@ -115,8 +118,8 @@ test.describe("screenshots", () => {
 
   test("can be chosen and then stay put", async ({ page }) => {
     await page.clock.install();
-    const { panel, slides, count } = await showPanel(page, (n) => n > 1);
-    const last = panel.getByRole("button", {
+    const { dialog, slides, count } = await openDialog(page, (n) => n > 1);
+    const last = dialog.getByRole("button", {
       name: `Show screenshot ${count} of ${count}`,
     });
     await last.click();
@@ -128,10 +131,7 @@ test.describe("screenshots", () => {
   });
 
   test("slide with the arrow keys in the popup", async ({ page }) => {
-    const { panel } = await showPanel(page, (count) => count > 1);
-    const id = await panel.getAttribute("data-panel");
-    await page.locator(`a.row[data-target="${id}"]`).click();
-    const slides = page.locator(`dialog[data-dialog="${id}"] .shot`);
+    const { slides } = await openDialog(page, (count) => count > 1);
     await expect(slides.first()).toHaveAttribute("data-active", "");
 
     await page.keyboard.press("ArrowRight");
@@ -143,10 +143,7 @@ test.describe("screenshots", () => {
   });
 
   test("expand to fullscreen from the popup", async ({ page }) => {
-    const { panel } = await showPanel(page, (count) => count > 0);
-    const id = await panel.getAttribute("data-panel");
-    await page.locator(`a.row[data-target="${id}"]`).click();
-    const dialog = page.locator(`dialog[data-dialog="${id}"]`);
+    const { dialog } = await openDialog(page, (count) => count > 0);
     const zoom = dialog.locator(".zoom");
     await expect(zoom).toHaveAttribute("aria-pressed", "false");
 
@@ -168,10 +165,7 @@ test.describe("screenshots", () => {
         value: undefined,
       });
     });
-    const { panel } = await showPanel(page, (count) => count > 0);
-    const id = await panel.getAttribute("data-panel");
-    await page.locator(`a.row[data-target="${id}"]`).click();
-    const dialog = page.locator(`dialog[data-dialog="${id}"]`);
+    const { dialog } = await openDialog(page, (count) => count > 0);
     const zoom = dialog.locator(".zoom");
 
     await zoom.click();
@@ -187,8 +181,8 @@ test.describe("screenshots", () => {
   });
 
   test("projects without any keep the placeholder", async ({ page }) => {
-    const { panel } = await showPanel(page, (count) => count === 0);
-    await expect(panel.getByText("AWAITING VISUAL FEED")).toBeVisible();
+    const { dialog } = await openDialog(page, (count) => count === 0);
+    await expect(dialog.getByText("AWAITING VISUAL FEED")).toBeVisible();
   });
 });
 
